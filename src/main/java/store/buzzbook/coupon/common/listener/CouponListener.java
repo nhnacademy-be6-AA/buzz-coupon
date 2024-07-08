@@ -80,21 +80,5 @@ public class CouponListener implements ApplicationListener<ApplicationReadyEvent
 				.couponType(globalType)
 				.build());
 		}
-
-		if (Boolean.FALSE.equals(couponPolicyRepository.existsByName(BIRTHDAY_COUPON_POLICY_NAME))) {
-			couponPolicyRepository.save(CouponPolicy.builder()
-				.name(BIRTHDAY_COUPON_POLICY_NAME)
-				.discountType(DiscountType.RATE)
-				.discountRate(0.2)
-				.discountAmount(0)
-				.maxDiscountAmount(10000)
-				.standardPrice(20000)
-				.startDate(LocalDate.EPOCH)
-				.endDate(LocalDate.of(2099, 12, 31))
-				.period(0)
-				.deleted(false)
-				.couponType(globalType)
-				.build());
-		}
 	}
 }

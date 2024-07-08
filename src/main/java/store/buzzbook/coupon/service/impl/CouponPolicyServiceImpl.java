@@ -74,11 +74,19 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
 		for (String scopeName : scope) {
 			CouponScope couponScope = CouponScope.fromString(scopeName);
 			if (couponScope != null) {
-				policiesMap.computeIfPresent(couponScope, (key, value) -> couponPolicyRepository
+				List<CouponPolicyResponse> filteredPolicies = couponPolicyRepository
 					.findAllByCouponScope(couponScope)
 					.stream()
 					.map(CouponPolicyResponse::from)
-					.toList());
+					.toList();
+
+				if (couponScope == CouponScope.GLOBAL) {
+					filteredPolicies = filteredPolicies.stream()
+						.filter(policy -> !policy.name().contains("생일"))
+						.toList();
+				}
+
+				policiesMap.put(couponScope, filteredPolicies);
 			}
 		}
 
