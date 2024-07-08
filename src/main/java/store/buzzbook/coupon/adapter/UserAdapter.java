@@ -10,6 +10,6 @@ import store.buzzbook.coupon.dto.coupon.CreateUserCouponRequest;
 @FeignClient(name = "UserCouponAdapter", url = "http://${api.gateway.host}:" + "${api.gateway.port}/api/account")
 public interface UserAdapter {
 
-	@PostMapping("/coupons")
+	@PostMapping("/coupons/batch")
 	ResponseEntity<Void> createUserCoupon(@RequestBody CreateUserCouponRequest request);
 }
