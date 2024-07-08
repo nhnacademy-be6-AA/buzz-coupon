@@ -1,6 +1,6 @@
 package store.buzzbook.coupon.dto.coupon;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import store.buzzbook.coupon.common.constant.CouponStatus;
 
 /**
@@ -13,7 +13,10 @@ import store.buzzbook.coupon.common.constant.CouponStatus;
  */
 public record UpdateCouponRequest(
 
-	@NotNull(message = "status 는 null 일 수 없습니다.")
+	@NotBlank(message = "쿠폰 코드는 null 일 수 없습니다.")
+	String couponCode,
+
+	@NotBlank(message = "status 는 null 일 수 없습니다.")
 	CouponStatus status
 ) {
 }

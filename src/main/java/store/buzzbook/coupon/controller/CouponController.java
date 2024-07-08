@@ -22,6 +22,7 @@ import store.buzzbook.coupon.dto.coupon.CouponLogRequest;
 import store.buzzbook.coupon.dto.coupon.CouponResponse;
 import store.buzzbook.coupon.dto.coupon.CreateCouponRequest;
 import store.buzzbook.coupon.dto.coupon.CreateCouponResponse;
+import store.buzzbook.coupon.dto.coupon.OrderCouponResponse;
 import store.buzzbook.coupon.dto.coupon.UpdateCouponRequest;
 import store.buzzbook.coupon.service.CouponService;
 
@@ -52,6 +53,13 @@ public class CouponController {
 		return ResponseEntity.ok(couponService.getCoupon(couponId));
 	}
 
+	@PostMapping("/order")
+	@Operation(summary = "회원 쿠폰 조회", description = "회원이 가진 사용가능한 쿠폰 정보를 조회합니다.")
+	public ResponseEntity<List<OrderCouponResponse>> getUserCoupons(
+		@Valid @RequestBody List<CouponLogRequest> request) {
+		return ResponseEntity.ok(couponService.getAvailableCoupons(request));
+	}
+
 	/**
 	 * 회원이 가진 쿠폰 정보를 조회합니다.
 	 *
@@ -60,7 +68,7 @@ public class CouponController {
 	 */
 	@PostMapping("/condition")
 	@Transactional(readOnly = true)
-	@Operation(summary = "회원 쿠폰 조회", description = "회원이 가진 쿠폰 정보를 조회합니다.")
+	@Operation(summary = "회원 쿠폰 조회", description = "회원이 가진 쿠폰 정보를 상태에 따라 조회합니다.")
 	public ResponseEntity<List<CouponResponse>> getUserCoupons(@Valid @RequestBody List<CouponLogRequest> request,
 		@RequestParam String couponStatusName) {
 		return ResponseEntity.ok(couponService.getAllCouponsByStatus(request, couponStatusName));
@@ -82,15 +90,12 @@ public class CouponController {
 	/**
 	 * 쿠폰 상태를 수정합니다.
 	 *
-	 * @param couponId 수정할 쿠폰의 ID
 	 * @param request 쿠폰 수정 요청 정보를 담은 객체
 	 * @return 수정된 쿠폰 정보를 담은 ResponseEntity 객체
 	 */
-	@PutMapping("/{couponId}")
-	@Transactional
+	@PutMapping
 	@Operation(summary = "쿠폰 수정", description = "쿠폰 상태를 수정합니다.")
-	public ResponseEntity<CouponResponse> updateCoupon(@PathVariable long couponId,
-		@Valid @RequestBody UpdateCouponRequest request) {
-		return ResponseEntity.ok(couponService.updateCoupon(couponId, request));
+	public ResponseEntity<CouponResponse> updateCoupon(@Valid @RequestBody UpdateCouponRequest request) {
+		return ResponseEntity.ok(couponService.updateCoupon(request));
 	}
 }

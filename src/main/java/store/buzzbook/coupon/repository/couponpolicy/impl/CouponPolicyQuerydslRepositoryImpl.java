@@ -15,9 +15,15 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 
 import lombok.extern.slf4j.Slf4j;
 import store.buzzbook.coupon.common.constant.CouponScope;
+import store.buzzbook.coupon.common.constant.CouponStatus;
 import store.buzzbook.coupon.common.constant.DiscountType;
+import store.buzzbook.coupon.dto.coupon.OrderCouponResponse;
 import store.buzzbook.coupon.dto.couponpolicy.CouponPolicyConditionRequest;
+import store.buzzbook.coupon.dto.couponpolicy.CouponPolicyResponse;
+import store.buzzbook.coupon.entity.Coupon;
 import store.buzzbook.coupon.entity.CouponPolicy;
+import store.buzzbook.coupon.entity.QCategoryCoupon;
+import store.buzzbook.coupon.entity.QCoupon;
 import store.buzzbook.coupon.entity.QCouponPolicy;
 import store.buzzbook.coupon.entity.QSpecificCoupon;
 import store.buzzbook.coupon.repository.couponpolicy.CouponPolicyQuerydslRepository;
@@ -109,6 +115,51 @@ public class CouponPolicyQuerydslRepositoryImpl extends QuerydslRepositorySuppor
 			.fetch().size();
 
 		return new PageImpl<>(couponPolicies, condition.pageable(), total);
+	}
+
+	@Override
+	public OrderCouponResponse findCouponsWithTargetId(String couponCode) {
+		QCouponPolicy couponPolicy = QCouponPolicy.couponPolicy;
+		QCoupon coupon = QCoupon.coupon;
+		QSpecificCoupon specificCoupon = QSpecificCoupon.specificCoupon;
+		QCategoryCoupon categoryCoupon = QCategoryCoupon.categoryCoupon;
+
+		Coupon fetchedCoupon = from(coupon)
+			.leftJoin(coupon.couponPolicy, couponPolicy)
+			.leftJoin(specificCoupon).on(couponPolicy.id.eq(specificCoupon.couponPolicy.id))
+			.leftJoin(categoryCoupon).on(couponPolicy.id.eq(categoryCoupon.couponPolicy.id))
+			.where(coupon.couponCode.eq(couponCode), coupon.status.eq(CouponStatus.AVAILABLE))
+			.fetchOne();
+
+		if (fetchedCoupon == null) {
+			return null;
+		}
+
+		return OrderCouponResponse.builder()
+			.code(fetchedCoupon.getCouponCode())
+			.createDate(fetchedCoupon.getCreateDate())
+			.expireDate(fetchedCoupon.getExpireDate())
+			.status(fetchedCoupon.getStatus())
+			.couponPolicyResponse(CouponPolicyResponse.from(fetchedCoupon.getCouponPolicy()))
+			.targetId(getTargetId(fetchedCoupon.getCouponPolicy()))
+			.build();
+	}
+
+	private Integer getTargetId(CouponPolicy policy) {
+		if (policy.getCouponType().getName() == CouponScope.GLOBAL) {
+			return 0;
+		} else if (policy.getCouponType().getName() == CouponScope.BOOK) {
+			return from(QSpecificCoupon.specificCoupon)
+				.where(QSpecificCoupon.specificCoupon.couponPolicy.id.eq(policy.getId()))
+				.select(QSpecificCoupon.specificCoupon.bookId)
+				.fetchOne();
+		} else if (policy.getCouponType().getName() == CouponScope.CATEGORY) {
+			return from(QCategoryCoupon.categoryCoupon)
+				.where(QCategoryCoupon.categoryCoupon.couponPolicy.id.eq(policy.getId()))
+				.select(QCategoryCoupon.categoryCoupon.categoryId)
+				.fetchOne();
+		}
+		return null;
 	}
 
 	/**

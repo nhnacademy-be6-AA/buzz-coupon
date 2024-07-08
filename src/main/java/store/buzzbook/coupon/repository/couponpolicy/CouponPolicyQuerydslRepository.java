@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 
 import store.buzzbook.coupon.common.constant.CouponScope;
+import store.buzzbook.coupon.dto.coupon.OrderCouponResponse;
 import store.buzzbook.coupon.dto.couponpolicy.CouponPolicyConditionRequest;
 import store.buzzbook.coupon.entity.CouponPolicy;
 
@@ -39,4 +40,7 @@ public interface CouponPolicyQuerydslRepository {
 	 * @return 페이징 처리된 쿠폰 정책 리스트
 	 */
 	Page<CouponPolicy> findAllByCondition(CouponPolicyConditionRequest condition);
+
+	OrderCouponResponse findCouponsWithTargetId(String couponCode);
+
 }
