@@ -95,7 +95,7 @@ public class CouponController {
 	 */
 	@PutMapping
 	@Operation(summary = "쿠폰 수정", description = "쿠폰 상태를 수정합니다.")
-	public ResponseEntity<CouponResponse> updateCoupon(@Valid @RequestBody UpdateCouponRequest request) {
+	public ResponseEntity<CouponResponse> updateCoupon(@RequestBody UpdateCouponRequest request) {
 		return ResponseEntity.ok(couponService.updateCoupon(request));
 	}
 }
