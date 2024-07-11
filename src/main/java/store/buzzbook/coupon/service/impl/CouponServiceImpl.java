@@ -158,6 +158,21 @@ public class CouponServiceImpl implements CouponService {
 		return CouponResponse.from(coupon);
 	}
 
+	@Transactional
+	@Override
+	public CouponResponse reviveCoupon(String couponCode) {
+		if (Boolean.FALSE.equals(couponRepository.existsByCouponCode(couponCode))) {
+			throw new CouponNotFoundException();
+		}
+
+		Coupon coupon = couponRepository.findByCouponCode(couponCode).orElseThrow(CouponNotFoundException::new);
+
+		Coupon newCoupon = Coupon.builder().id(coupon.getId()).couponCode(coupon.getCouponCode()).couponPolicy(coupon.getCouponPolicy())
+			.status(CouponStatus.AVAILABLE).createDate(coupon.getCreateDate()).expireDate(coupon.getExpireDate()).build();
+
+		return CouponResponse.from(newCoupon);
+	}
+
 	/**
 	 * 주어진 ID가 유효한지 확인합니다.
 	 *

@@ -46,9 +46,10 @@ public interface CouponService {
 	/**
 	 * 쿠폰을 업데이트합니다.
 	 *
-	 * @param id 쿠폰 ID
 	 * @param request 쿠폰 업데이트 요청 객체
 	 * @return 업데이트된 쿠폰 응답 객체
 	 */
 	CouponResponse updateCoupon(UpdateCouponRequest request);
+
+	CouponResponse reviveCoupon(String couponCode);
 }

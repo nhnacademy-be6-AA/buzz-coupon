@@ -98,4 +98,11 @@ public class CouponController {
 	public ResponseEntity<CouponResponse> updateCoupon(@RequestBody UpdateCouponRequest request) {
 		return ResponseEntity.ok(couponService.updateCoupon(request));
 	}
+
+	@GetMapping("/couponCode/{couponCode}")
+	@Transactional(readOnly = true)
+	@Operation(summary = "사용된 쿠폰 되살리고 반환", description = "사용된 쿠폰 되살리고 반환합니다.")
+	public ResponseEntity<CouponResponse> reviveCouponWithCouponCode(@PathVariable("couponCode") String couponCode) {
+		return ResponseEntity.ok(couponService.reviveCoupon(couponCode));
+	}
 }
