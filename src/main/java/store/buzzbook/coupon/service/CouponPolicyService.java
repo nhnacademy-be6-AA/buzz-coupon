@@ -3,6 +3,7 @@ package store.buzzbook.coupon.service;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import store.buzzbook.coupon.dto.coupon.CouponPoliciesResponse;
 import store.buzzbook.coupon.dto.couponpolicy.CouponPolicyConditionRequest;
@@ -26,7 +27,7 @@ public interface CouponPolicyService {
 	 * @param condition 쿠폰 정책 조회 조건
 	 * @return 페이징 처리된 쿠폰 정책 응답 리스트
 	 */
-	Page<CouponPolicyResponse> getCouponPoliciesByPaging(CouponPolicyConditionRequest condition);
+	Page<CouponPolicyResponse> getCouponPoliciesByPaging(Pageable pageable, CouponPolicyConditionRequest condition);
 
 	/**
 	 * 쿠폰 범위에 따라 모든 쿠폰 정책을 조회합니다.

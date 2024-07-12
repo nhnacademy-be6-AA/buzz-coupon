@@ -1,10 +1,10 @@
 package store.buzzbook.coupon.common.service.impl;
 
-import static store.buzzbook.coupon.common.config.RabbitmqConfig.*;
 import static store.buzzbook.coupon.common.constant.CouponPolicyConstant.*;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +25,12 @@ import store.buzzbook.coupon.service.CouponService;
 @RequiredArgsConstructor
 public class ConsumerServiceImpl {
 
+	@Value("${spring.rabbitmq.coupon.queue}")
+	private String queueName;
+
+	@Value("${spring.rabbitmq.coupon.routing-key}")
+	private String routingKey;
+
 	private final CouponPolicyRepository couponPolicyRepository;
 	private final UserAdapter userAdapter;
 	private final CouponService couponService;
@@ -32,7 +38,7 @@ public class ConsumerServiceImpl {
 	private final RabbitTemplate rabbitTemplate;
 
 	@Transactional
-	@RabbitListener(queues = REQUEST_QUEUE_NAME)
+	@RabbitListener(queues = "${spring.rabbitmq.coupon.queue}")
 	public void receiveWelcomeCouponRequest(CreateWelcomeCouponRequest request) {
 		CouponPolicy welcomeCouponPolicy = couponPolicyRepository.findByName(WELCOME_COUPON_POLICY_NAME)
 			.orElseThrow(CouponPolicyNotFoundException::new);
@@ -48,9 +54,9 @@ public class ConsumerServiceImpl {
 			.build());
 	}
 
-	@RabbitListener(queues = DLQ_QUEUE_NAME)
+	@RabbitListener(queues = "${spring.rabbitmq.coupon.dlx.queue}")
 	public void handleDlqMessage(CreateWelcomeCouponRequest request) {
 
-		rabbitTemplate.convertAndSend(REQUEST_QUEUE_NAME, REQUEST_ROUTING_KEY, request);
+		rabbitTemplate.convertAndSend(queueName, routingKey, request);
 	}
 }

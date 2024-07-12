@@ -53,6 +53,12 @@ public class CouponController {
 		return ResponseEntity.ok(couponService.getCoupon(couponId));
 	}
 
+	/**
+	 * 회원이 가진 사용 가능한 쿠폰 정보를 조회합니다.
+	 *
+	 * @param request 쿠폰 상태 조회 요청 객체 리스트
+	 * @return 조회된 사용 가능한 쿠폰 응답 객체 리스트를 포함한 ResponseEntity
+	 */
 	@PostMapping("/order")
 	@Operation(summary = "회원 쿠폰 조회", description = "회원이 가진 사용가능한 쿠폰 정보를 조회합니다.")
 	public ResponseEntity<List<OrderCouponResponse>> getUserCoupons(
@@ -97,12 +103,5 @@ public class CouponController {
 	@Operation(summary = "쿠폰 수정", description = "쿠폰 상태를 수정합니다.")
 	public ResponseEntity<CouponResponse> updateCoupon(@RequestBody UpdateCouponRequest request) {
 		return ResponseEntity.ok(couponService.updateCoupon(request));
-	}
-
-	@GetMapping("/couponCode/{couponCode}")
-	@Transactional(readOnly = true)
-	@Operation(summary = "사용된 쿠폰 되살리고 반환", description = "사용된 쿠폰 되살리고 반환합니다.")
-	public ResponseEntity<CouponResponse> reviveCouponWithCouponCode(@PathVariable("couponCode") String couponCode) {
-		return ResponseEntity.ok(couponService.reviveCoupon(couponCode));
 	}
 }

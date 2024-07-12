@@ -3,6 +3,7 @@ package store.buzzbook.coupon.controller;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,8 +56,8 @@ public class CouponPolicyController {
 	@Transactional(readOnly = true)
 	@Operation(summary = "쿠폰 정책 리스트 조회", description = "조건과 페이징 처리된 모든 쿠폰 정책 리스트를 조회합니다.")
 	public ResponseEntity<Page<CouponPolicyResponse>> getCouponPoliciesByPaging(
-		@Valid @RequestBody CouponPolicyConditionRequest condition) {
-		return ResponseEntity.ok(couponPolicyService.getCouponPoliciesByPaging(condition));
+		@Valid @RequestBody CouponPolicyConditionRequest condition, Pageable pageable) {
+		return ResponseEntity.ok(couponPolicyService.getCouponPoliciesByPaging(pageable, condition));
 	}
 
 	/**

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,8 +54,11 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
 	 * @return 페이징 처리된 쿠폰 정책 응답 리스트
 	 */
 	@Override
-	public Page<CouponPolicyResponse> getCouponPoliciesByPaging(CouponPolicyConditionRequest condition) {
-		Page<CouponPolicy> couponPolicies = couponPolicyRepository.findAllByCondition(condition);
+	public Page<CouponPolicyResponse> getCouponPoliciesByPaging(Pageable pageable,
+		CouponPolicyConditionRequest condition) {
+		validateRequest(condition);
+
+		Page<CouponPolicy> couponPolicies = couponPolicyRepository.findAllByCondition(pageable, condition);
 		return couponPolicies.map(CouponPolicyResponse::from);
 	}
 
@@ -66,6 +70,10 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
 	 */
 	@Override
 	public CouponPoliciesResponse getCouponPoliciesByScope(List<String> scope) {
+		if (Objects.isNull(scope) || scope.isEmpty()) {
+			throw new CouponPolicyNotFoundException();
+		}
+
 		Map<CouponScope, List<CouponPolicyResponse>> policiesMap = new EnumMap<>(CouponScope.class);
 		policiesMap.put(CouponScope.GLOBAL, new ArrayList<>());
 		policiesMap.put(CouponScope.BOOK, new ArrayList<>());
@@ -122,6 +130,7 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
 	@Override
 	public CouponPolicy getCouponPolicyById(int id) {
 		validateId(id);
+
 		return couponPolicyRepository.findById(id).orElseThrow(CouponPolicyNotFoundException::new);
 	}
 
@@ -134,9 +143,7 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
 	@Transactional
 	@Override
 	public CreateCouponPolicyResponse createCouponPolicy(CreateCouponPolicyRequest request) {
-		if (Objects.isNull(request)) {
-			throw new IllegalArgumentException("쿠폰 생성 요청을 찾을 수 없습니다.");
-		}
+		validateRequest(request);
 
 		CouponType couponType = couponTypeService.getCouponType(request.couponType());
 
@@ -185,10 +192,7 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
 	@Override
 	public CouponPolicyResponse updateCouponPolicy(int id, UpdateCouponPolicyRequest request) {
 		validateId(id);
-
-		if (Objects.isNull(request)) {
-			throw new IllegalArgumentException("쿠폰 생성 요청을 찾을 수 없습니다.");
-		}
+		validateRequest(request);
 
 		CouponPolicy couponPolicy = getCouponPolicyById(id);
 		couponPolicy.changeEndDate(request.endDate());
@@ -222,6 +226,18 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
 	private void validateId(int id) {
 		if (id <= 0) {
 			throw new IllegalArgumentException("잘못된 파라미터 값입니다.");
+		}
+	}
+
+	/**
+	 * 주어진 request 가 유효한지 확인합니다.
+	 *
+	 * @param request 유효성을 검사할 request
+	 * @throws IllegalArgumentException request 가 유효하지 않은 경우
+	 */
+	private void validateRequest(Object request) {
+		if (Objects.isNull(request)) {
+			throw new IllegalArgumentException("요청 값이 null 입니다.");
 		}
 	}
 }

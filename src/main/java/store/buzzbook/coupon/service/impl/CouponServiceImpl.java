@@ -64,6 +64,14 @@ public class CouponServiceImpl implements CouponService {
 	 */
 	@Override
 	public List<CouponResponse> getAllCouponsByStatus(List<CouponLogRequest> request, String couponStatusName) {
+		if (Objects.isNull(request) || request.isEmpty()) {
+			return new ArrayList<>();
+		}
+
+		if (Objects.isNull(couponStatusName)) {
+			throw new IllegalArgumentException("couponStatusName 이 null 입니다.");
+		}
+
 		List<CouponResponse> responses = new ArrayList<>();
 
 		if (couponStatusName.equals("all")) {
@@ -88,12 +96,25 @@ public class CouponServiceImpl implements CouponService {
 		return responses;
 	}
 
+	/**
+	 * 주어진 요청 목록에 따라 사용 가능한 쿠폰 정보를 조회합니다.
+	 *
+	 * @param request 쿠폰 상태 조회 요청 객체 리스트
+	 * @return 조회된 사용 가능한 쿠폰 응답 객체 리스트
+	 */
 	@Override
 	public List<OrderCouponResponse> getAvailableCoupons(List<CouponLogRequest> request) {
+		if (Objects.isNull(request) || request.isEmpty()) {
+			return new ArrayList<>();
+		}
+
 		List<OrderCouponResponse> responses = new ArrayList<>();
 
 		for (CouponLogRequest couponLogRequest : request) {
-			responses.add(couponPolicyRepository.findCouponsWithTargetId(couponLogRequest.couponCode()));
+			OrderCouponResponse coupon = couponPolicyRepository.findCouponsWithTargetId(couponLogRequest.couponCode());
+			if (Objects.nonNull(coupon)) {
+				responses.add(coupon);
+			}
 		}
 
 		return responses;
@@ -112,12 +133,8 @@ public class CouponServiceImpl implements CouponService {
 			throw new IllegalArgumentException("쿠폰 로그 생성 요청을 찾을 수 없습니다.");
 		}
 
-		String couponCode = CodeCreator.createCode();
-		while (Boolean.TRUE.equals(couponRepository.existsByCouponCode(couponCode))) {
-			couponCode = CodeCreator.createCode();
-		}
-
 		CouponPolicy couponPolicy = couponPolicyService.getCouponPolicyById(request.couponPolicyId());
+		String couponCode = CodeCreator.createCode();
 		LocalDate now = LocalDate.now();
 
 		Coupon coupon = Coupon.builder()
@@ -146,7 +163,7 @@ public class CouponServiceImpl implements CouponService {
 			throw new IllegalArgumentException("쿠폰 로그 수정 요청을 찾을 수 없습니다.");
 		}
 
-		if (!couponRepository.existsByCouponCode(request.couponCode())) {
+		if (Boolean.FALSE.equals(couponRepository.existsByCouponCode(request.couponCode()))) {
 			throw new CouponNotFoundException();
 		}
 
@@ -156,21 +173,6 @@ public class CouponServiceImpl implements CouponService {
 		coupon.changeStatus(request.status());
 
 		return CouponResponse.from(coupon);
-	}
-
-	@Transactional
-	@Override
-	public CouponResponse reviveCoupon(String couponCode) {
-		if (Boolean.FALSE.equals(couponRepository.existsByCouponCode(couponCode))) {
-			throw new CouponNotFoundException();
-		}
-
-		Coupon coupon = couponRepository.findByCouponCode(couponCode).orElseThrow(CouponNotFoundException::new);
-
-		Coupon newCoupon = Coupon.builder().id(coupon.getId()).couponCode(coupon.getCouponCode()).couponPolicy(coupon.getCouponPolicy())
-			.status(CouponStatus.AVAILABLE).createDate(coupon.getCreateDate()).expireDate(coupon.getExpireDate()).build();
-
-		return CouponResponse.from(newCoupon);
 	}
 
 	/**

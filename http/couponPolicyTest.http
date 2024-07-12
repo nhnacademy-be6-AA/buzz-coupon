@@ -12,7 +12,7 @@ Content-Type: application/json
   "startDate": "2024-06-23",
   "endDate": "2024-06-25",
   "couponType": "category",
-  "targetId": 1
+  "targetId": -1
 }
 
 ###

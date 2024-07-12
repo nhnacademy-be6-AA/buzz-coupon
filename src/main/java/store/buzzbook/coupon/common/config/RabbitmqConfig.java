@@ -17,13 +17,23 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitmqConfig {
 
-	public static final String REQUEST_EXCHANGE_NAME = "aa.coupon.exchange";
-	public static final String REQUEST_QUEUE_NAME = "aa.coupon.queue";
-	public static final String REQUEST_ROUTING_KEY = "aa.coupon.key";
+	@Value("${spring.rabbitmq.coupon.exchange}")
+	public String exchangeName;
 
-	public static final String DLX_EXCHANGE_NAME = "aa.coupon.dlx.exchange";
-	public static final String DLQ_QUEUE_NAME = "aa.coupon.dlx.queue";
-	public static final String DLQ_ROUTING_KEY = "aa.coupon.dlx.key";
+	@Value("${spring.rabbitmq.coupon.queue}")
+	public String queueName;
+
+	@Value("${spring.rabbitmq.coupon.routing-key}")
+	public String routingKey;
+
+	@Value("${spring.rabbitmq.coupon.dlx.exchange}")
+	public String dlxExchangeName;
+
+	@Value("${spring.rabbitmq.coupon.dlx.queue}")
+	public String dlxQueueName;
+
+	@Value("${spring.rabbitmq.coupon.dlx.routing-key}")
+	public String dlxRoutingKey;
 
 	@Value("${spring.rabbitmq.host}")
 	private String host;
@@ -39,35 +49,35 @@ public class RabbitmqConfig {
 
 	@Bean
 	DirectExchange requestExchange() {
-		return new DirectExchange(REQUEST_EXCHANGE_NAME, true, false, null);
+		return new DirectExchange(exchangeName, true, false, null);
 	}
 
 	@Bean
 	Queue requestQueue() {
-		return QueueBuilder.durable(REQUEST_QUEUE_NAME)
-			.withArgument("x-dead-letter-exchange", DLX_EXCHANGE_NAME)
-			.withArgument("x-dead-letter-routing-key", DLQ_ROUTING_KEY)
+		return QueueBuilder.durable(queueName)
+			.withArgument("x-dead-letter-exchange", dlxExchangeName)
+			.withArgument("x-dead-letter-routing-key", dlxRoutingKey)
 			.build();
 	}
 
 	@Bean
 	Binding requestBinding(DirectExchange requestExchange, Queue requestQueue) {
-		return BindingBuilder.bind(requestQueue).to(requestExchange).with(REQUEST_ROUTING_KEY);
+		return BindingBuilder.bind(requestQueue).to(requestExchange).with(routingKey);
 	}
 
 	@Bean
 	DirectExchange dlxExchange() {
-		return new DirectExchange(DLX_EXCHANGE_NAME);
+		return new DirectExchange(exchangeName);
 	}
 
 	@Bean
 	Queue dlqQueue() {
-		return new Queue(DLQ_QUEUE_NAME, true);
+		return new Queue(dlxQueueName, true);
 	}
 
 	@Bean
 	Binding dlqBinding(DirectExchange dlxExchange, Queue dlqQueue) {
-		return BindingBuilder.bind(dlqQueue).to(dlxExchange).with(DLQ_ROUTING_KEY);
+		return BindingBuilder.bind(dlqQueue).to(dlxExchange).with(dlxRoutingKey);
 	}
 
 	@Bean

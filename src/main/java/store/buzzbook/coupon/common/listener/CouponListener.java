@@ -72,7 +72,7 @@ public class CouponListener implements ApplicationListener<ApplicationReadyEvent
 				.discountRate(0)
 				.discountAmount(10000)
 				.maxDiscountAmount(0)
-				.standardPrice(50000)
+				.standardPrice(10000)
 				.startDate(LocalDate.EPOCH)
 				.endDate(LocalDate.of(2099, 12, 31))
 				.period(30)

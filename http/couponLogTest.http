@@ -1,12 +1,8 @@
-POST http://localhost:8091/api/coupons/logs
+POST http://localhost:8091/api/coupons
 Content-Type: application/json
 
 {
-  "couponPolicyId": 420,
-  "createDate": "2024-06-24T22:48:23.414Z",
-  "expireDate": "2024-06-24T22:48:23.414Z",
-  "status": "available",
-  "userId": 8
+  "couponPolicyId": 420
 }
 
 ###

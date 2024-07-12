@@ -3,6 +3,8 @@ package store.buzzbook.coupon.common.handler;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -13,7 +15,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import lombok.extern.slf4j.Slf4j;
 import store.buzzbook.coupon.common.exception.CouponAlreadyExistsException;
 import store.buzzbook.coupon.common.exception.CouponNotFoundException;
 import store.buzzbook.coupon.common.exception.CouponPolicyNotFoundException;
@@ -26,8 +27,9 @@ import store.buzzbook.coupon.common.exception.CouponTypeNotFoundException;
  * </p>
  */
 @RestControllerAdvice
-@Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+	private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
 	/**
 	 * IllegalArgumentException 이 발생했을 때 HTTP 400 상태 코드와 함께 예외 메시지를 반환합니다.

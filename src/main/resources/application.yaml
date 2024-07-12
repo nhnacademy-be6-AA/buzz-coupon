@@ -8,13 +8,6 @@ spring:
   profiles:
     default: test
 
-  data:
-    web:
-      pageable:
-        default-page-size: 10
-        max-page-size: 50
-        one-indexed-parameters: false
-
   rabbitmq:
     host: 133.186.241.167
     port: 5672
@@ -29,6 +22,16 @@ spring:
           max-interval: 6s
           max-attempts: 2
           multiplier: 3
+
+    coupon:
+      exchange: aa.coupon.exchange
+      queue: aa.coupon.queue
+      routing-key: aa.coupon.key
+
+      dlx:
+        exchange: aa.coupon.dlx.exchange
+        queue: aa.coupon.dlx.queue
+        routing-key: aa.coupon.dlx.key
 
 springdoc:
   api-docs:
@@ -46,3 +49,16 @@ springdoc:
   cache:
     disabled: true
   model-and-view-allowed: true
+
+logncrash:
+  config:
+    file-path: logs
+    file-name: coupon-log
+  app-key: Xyx7DoyszcG66ULx
+  url: https://api-logncrash.cloud.toast.com
+  version: 1.0.0
+  host: aa-coupon-api
+  log:
+    version: v2
+    source: aa
+    type: aa

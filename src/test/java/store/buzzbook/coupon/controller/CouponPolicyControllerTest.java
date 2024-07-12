@@ -23,6 +23,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import store.buzzbook.coupon.common.constant.CouponScope;
 import store.buzzbook.coupon.common.constant.DiscountType;
+import store.buzzbook.coupon.dto.coupon.CouponPoliciesResponse;
+import store.buzzbook.coupon.dto.couponpolicy.CouponPolicyConditionRequest;
 import store.buzzbook.coupon.dto.couponpolicy.CouponPolicyResponse;
 import store.buzzbook.coupon.dto.couponpolicy.CreateCouponPolicyRequest;
 import store.buzzbook.coupon.dto.couponpolicy.CreateCouponPolicyResponse;
@@ -173,5 +175,52 @@ class CouponPolicyControllerTest {
 			.andExpect(jsonPath("$[0].name").value(testCouponPolicyResponse.name()));
 
 		verify(couponPolicyService).getSpecificCoupons(anyInt());
+	}
+
+	@Test
+	@DisplayName("get coupon policies by paging")
+	void getCouponPoliciesByPaging() throws Exception {
+		// given
+		CouponPolicyConditionRequest condition = new CouponPolicyConditionRequest(
+			"amount",
+			"false",
+			"book"
+		);
+
+		when(couponPolicyService.getCouponPoliciesByPaging(any(), any())).thenReturn(couponPolicyPage);
+
+		// when & then
+		mockMvc.perform(post("/api/coupons/policies/condition")
+				.content(objectMapper.writeValueAsString(condition))
+				.param("page", "0")
+				.param("size", "20")
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.content[0].id").value(testCouponPolicyResponse.id()))
+			.andExpect(jsonPath("$.content[0].name").value(testCouponPolicyResponse.name()));
+
+		verify(couponPolicyService).getCouponPoliciesByPaging(any(), any());
+	}
+
+	@Test
+	@DisplayName("get coupon policies by scope")
+	void getCouponPoliciesByScope() throws Exception {
+		// given
+		CouponPoliciesResponse response = CouponPoliciesResponse.builder()
+			.globalCouponPolicies(List.of(testCouponPolicyResponse))
+			.specificCouponPolicies(List.of())
+			.categoryCouponPolicies(List.of())
+			.build();
+
+		when(couponPolicyService.getCouponPoliciesByScope(anyList())).thenReturn(response);
+
+		// when & then
+		mockMvc.perform(get("/api/coupons/policies")
+				.param("scope", "global"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.globalCouponPolicies[0].id").value(testCouponPolicyResponse.id()))
+			.andExpect(jsonPath("$.globalCouponPolicies[0].name").value(testCouponPolicyResponse.name()));
+
+		verify(couponPolicyService).getCouponPoliciesByScope(anyList());
 	}
 }

@@ -18,7 +18,7 @@ public class CodeCreator {
 	/**
 	 * 이 클래스는 인스턴스화할 수 없습니다.
 	 * <p>
-	 * 유틸리티 클래스이므로, 인스턴스화하려고 하면 IllegalStateException이 발생합니다.
+	 * 유틸리티 클래스이므로, 인스턴스화하려고 하면 IllegalStateException 이 발생합니다.
 	 * </p>
 	 */
 	private CodeCreator() {
@@ -29,7 +29,7 @@ public class CodeCreator {
 	 * 고유한 코드를 생성합니다.
 	 * <p>
 	 * 생성된 코드는 대문자 알파벳과 숫자로 구성됩니다.
-	 * 예: "ABCDEFGHIJKLNOPQ"
+	 * 예: "ABCDEFGHIJKLNOPQ123345"
 	 * </p>
 	 *
 	 * @return 생성된 고유 코드 문자열
