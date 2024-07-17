@@ -58,6 +58,7 @@ logncrash:
   url: https://api-logncrash.cloud.toast.com
   version: 1.0.0
   host: aa-coupon-api
+  platform: aa-coupon-api
   log:
     version: v2
     source: aa

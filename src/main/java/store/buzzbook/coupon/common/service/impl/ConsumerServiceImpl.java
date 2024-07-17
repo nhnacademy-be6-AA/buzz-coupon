@@ -40,6 +40,7 @@ public class ConsumerServiceImpl {
 	@Transactional
 	@RabbitListener(queues = "${spring.rabbitmq.coupon.queue}")
 	public void receiveWelcomeCouponRequest(CreateWelcomeCouponRequest request) {
+		log.debug("Received WelcomeCouponRequest: {}", request);
 		CouponPolicy welcomeCouponPolicy = couponPolicyRepository.findByName(WELCOME_COUPON_POLICY_NAME)
 			.orElseThrow(CouponPolicyNotFoundException::new);
 
@@ -56,6 +57,7 @@ public class ConsumerServiceImpl {
 
 	@RabbitListener(queues = "${spring.rabbitmq.coupon.dlx.queue}")
 	public void handleDlqMessage(CreateWelcomeCouponRequest request) {
+		log.debug("Received DlqMessage: {}", request);
 
 		rabbitTemplate.convertAndSend(queueName, routingKey, request);
 	}
